@@ -1,65 +1,121 @@
-import Image from "next/image";
+"use client";
+import { useThemeStore } from "@/stores/useThemeStore";
+import { useToDoListStore } from "@/stores/useToDoListStore";
+import { Moon, Sun } from "lucide-react"; 
+import React from "react";
+import ToDoList from "./components/ToDoList";
+import Sorting from "./components/Sorting";
+import ModalUpdateList from "./components/ModalUpdateList";
+import SearchInput from "./components/SearchInput";
+import ModalDelete from "./components/ModalDelete";
 
-export default function Home() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+const Page = () => {
+  const { darkMode, setDarkMode } = useThemeStore();
+  const [search, setSearch] = React.useState("");
+  const [toDo, setToDo] = React.useState("");
+  const { toDoList, addToDoList, completedToDos, filter, clearCompletedToDos } = useToDoListStore();
+
+  // Logic filter & sort tetap sama
+  let list = toDoList.filter((item) => {
+    if (filter === "active") return !completedToDos.includes(item.id);
+    if (filter === "completed") return completedToDos.includes(item.id);
+    return true;
+  });
+
+  const sortedToDoList = [...list].sort((a, b) => b.createdAt - a.createdAt);
+
+  const finalList = sortedToDoList.filter((item) =>
+    item.text.toLowerCase().includes(search.toLowerCase())
   );
-}
+
+  const itemsLeft = toDoList.filter((toDo) => !completedToDos.includes(toDo.id)).length;
+
+  return (
+    <>
+    <ModalDelete darkMode={darkMode}/>
+      <ModalUpdateList />
+      {/* Container Utama: Pakai min-h-screen dan w-full */}
+      <div className={`w-full min-h-screen flex flex-col relative ${darkMode ? "bg-[#171823]" : "bg-[#FAFAFA]"}`}>
+        
+        {/* Konten Todo: Kita buat absolut-tengah tapi lebar responsive */}
+        <div className="absolute w-full px-6 top-12 sm:top-20 md:top-39.5 left-0 z-10 flex flex-col items-center">
+          <div className="w-full max-w-[540px] flex flex-col gap-6">
+            
+            {/* HEADER (TODO + TOGGLE) - Pindah ke dalam agar sejajar */}
+            <div className="flex items-center justify-between w-full mb-4">
+              <h1 className="font-josefin-sans font-bold text-white text-[28px] sm:text-[40px] leading-[100%] tracking-[10px] sm:tracking-[15px]">
+                TODO
+              </h1>
+              <button onClick={setDarkMode} className="transition-transform active:scale-90">
+                {darkMode ? <Sun className="text-white fill-white size-5 sm:size-6" /> : <Moon className="text-white fill-white size-5 sm:size-6" />}
+              </button>
+            </div>
+
+            {/* CREATE NEW TODO */}
+            <form className="w-full" onSubmit={(e) => e.preventDefault()}>
+              <div className={`w-full h-12 sm:h-16 ${darkMode ? "bg-[#25273D]" : "bg-white"} flex items-center px-5 sm:p-6 gap-4 sm:gap-6 rounded shadow-md`}>
+                <div className="size-5 sm:size-6 rounded-full border-2 border-gray-300 flex-shrink-0"></div>
+                <input
+                  type="text"
+                  placeholder="Create a new todo..."
+                  className={`w-full bg-transparent focus:outline-none josefin-sans text-[14px] sm:text-[18px] ${darkMode ? "text-white" : "text-black"}`}
+                  onChange={(e) => setToDo(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && toDo.trim()) {
+                      addToDoList(toDo);
+                      setToDo("");
+                    }
+                  }}
+                  value={toDo}
+                />
+              </div>
+            </form>
+
+            <SearchInput setSearch={setSearch} darkMode={darkMode} />
+
+            {/* LIST ITEMS */}
+            <div className={`w-full ${darkMode ? "bg-[#25273D] text-white" : "bg-white"} rounded shadow-2xl overflow-hidden`}>
+              <div className="w-full max-h-61 sm:max-h-112.5 overflow-y-auto">
+                {finalList.map((toDo, index) => (
+                  <ToDoList key={toDo.id} toDo={toDo} index={index} darkMode={darkMode} />
+                ))}
+              </div>
+
+              {/* FOOTER */}
+              <div className="w-full h-12 sm:h-16 flex justify-between items-center px-4 sm:px-6 text-[12px] sm:text-[14px] text-gray-500 border-t dark:border-gray-700">
+                <span>{itemsLeft} items left</span>
+                <div className="hidden md:block"> {/* Sorting muncul di tengah hanya di desktop */}
+                  <Sorting darkMode={darkMode}/>
+                </div>
+                <span className="cursor-pointer hover:text-blue-500" onClick={clearCompletedToDos}>
+                  Clear Completed
+                </span>
+              </div>
+            </div>
+
+            {/* MOBILE SORTING (Hanya muncul di HP) */}
+            <div className={`md:hidden w-full h-12 flex justify-center items-center rounded shadow-md ${darkMode ? "bg-[#25273D]" : "bg-white"}`}>
+              <Sorting darkMode={darkMode}/>
+            </div>
+
+            <p className="font-josefin-sans text-center text-[#9495A5] text-xs sm:text-sm mt-4 sm:mt-10">
+              Drag and drop to reorder list
+            </p>
+          </div>
+        </div>
+
+        {/* BACKGROUND IMAGE - Responsive height */}
+        <div className="w-full h-[200px] sm:h-[300px] relative overflow-hidden">
+          <img
+            src={darkMode ? "/bg-desktop-dark.png" : "/bg-desktop-light.png"}
+            className="w-full h-full object-cover"
+            alt="background"
+          />
+          <div className={`w-full h-full absolute top-0 left-0 bg-gradient-to-b ${darkMode ? "from-[#3710BD]/90 to-[#A42395]/90" : "from-[#5596FF]/80 to-[#AC2DEB]/80"}`}></div>
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Page;
