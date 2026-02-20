@@ -1,20 +1,32 @@
 import { FilterType, useToDoListStore } from "@/stores/useToDoListStore";
 import React from "react";
 
-const Sorting = ({darkMode}: {darkMode: boolean}) => {
+const Sorting = () => {
   const { filter, setFilter } = useToDoListStore();
-  const sort = ["all", "active", "completed"];
+  const sortOptions = ["all", "active", "completed"];
+
   return (
-    <div className="w-41.5 flex justify-between">
-      {sort.map((item, index) => (
-        <span
-          key={index}
-          className={`${item === filter && darkMode ? "text-blue-500" : darkMode ? "text-white" : "text-black"} cursor-pointer`}
-          onClick={() => setFilter(item as FilterType)}
-        >
-          {item}
-        </span>
-      ))}
+    <div className="flex gap-4 sm:gap-6 justify-center items-center font-bold text-[14px] josefin-sans">
+      {sortOptions.map((item) => {
+        const isActive = item === filter;
+
+        return (
+          <span
+            key={item}
+            onClick={() => setFilter(item as FilterType)}
+            className={`
+              cursor-pointer capitalize transition-all duration-300
+              ${
+                isActive
+                  ? "text-primary scale-110"
+                  : "text-base-content/50 hover:text-base-content"
+              }
+            `}
+          >
+            {item}
+          </span>
+        );
+      })}
     </div>
   );
 };

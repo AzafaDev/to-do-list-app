@@ -2,11 +2,15 @@
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useEffect } from "react";
 
-export default function ThemeProvider({ children }: { children: React.ReactNode }) {
+export default function ThemeProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { darkMode } = useThemeStore();
 
   return (
-    <body className={`${darkMode ? "bg-[#171823]" : "bg-[#FAFAFA]"} min-h-screen w-full`}>
+    <body className="min-h-screen" data-theme={darkMode ? "dark" : "light"}>
       {children}
     </body>
   );
