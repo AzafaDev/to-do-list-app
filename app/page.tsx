@@ -49,7 +49,7 @@ const Page = () => {
       <ModalUpdateList />
 
       {/* 1. BACKGROUND HEADER (Desktop & Mobile) */}
-      <div className="h-[200px] sm:h-[300px] w-full relative">
+      <div className="h-50 sm:h-75 w-full relative">
         <img
           src={darkMode ? "/bg-desktop-dark.png" : "/bg-desktop-light.png"}
           className="w-full h-full object-cover"
@@ -62,7 +62,7 @@ const Page = () => {
 
       {/* 2. MAIN CONTENT AREA (Pusat Kendali) */}
       <div className="absolute top-0 left-0 w-full flex flex-col items-center px-6 pt-12 sm:pt-20">
-        <div className="w-full max-w-[540px] flex flex-col gap-5 sm:gap-7">
+        <div className="w-full max-w-135 flex flex-col gap-5 sm:gap-7">
           {/* HEADER */}
           <div className="flex items-center justify-between w-full">
             <h1 className="text-2xl sm:text-4xl font-bold text-white tracking-[10px] sm:tracking-[15px]">
@@ -105,7 +105,7 @@ const Page = () => {
 
           {/* TODO LIST SECTION */}
           <div className="bg-base-100 rounded-md shadow-2xl overflow-hidden border border-base-300 flex flex-col">
-            <div className="max-h-[300px] sm:max-h-[450px] overflow-y-auto divide-y divide-base-300 custom-scrollbar">
+            <div className="max-h-75 sm:max-h-112.5 overflow-y-auto divide-y divide-base-300 custom-scrollbar">
               {finalList.length > 0 ? (
                 finalList.map((toDo, index) => (
                   <ToDoList key={toDo.id} toDo={toDo} index={index} />

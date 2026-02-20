@@ -15,15 +15,15 @@ const ToDoList = ({ toDo }: { toDo: ToDoItem; index: number }) => {
 
   return (
     <div
-      className="group w-full min-h-[56px] sm:h-16 flex items-center px-4 sm:px-6 py-3 gap-3 sm:gap-6 border-b border-base-300 bg-base-100 hover:bg-base-200/50 transition-all cursor-pointer"
+      className="group w-full min-h-14 sm:h-16 flex items-center px-4 sm:px-6 py-3 gap-3 sm:gap-6 border-b border-base-300 bg-base-100 hover:bg-base-200/50 transition-all cursor-pointer"
       onClick={() => toggleToDo(toDo.id)}
     >
       {/* CHECKBOX */}
       <div
-        className={`flex-shrink-0 size-5 sm:size-6 rounded-full flex items-center justify-center transition-all border
+        className={`shrink-0 size-5 sm:size-6 rounded-full flex items-center justify-center transition-all border
         ${
           isCompleted
-            ? "bg-gradient-to-br from-[#5596FF] to-[#AC2DEB] border-none"
+            ? "bg-linear-to-br from-[#5596FF] to-[#AC2DEB] border-none"
             : "border-base-content/20"
         }`}
       >
