@@ -1,25 +1,30 @@
 "use client";
 import { useThemeStore } from "@/stores/useThemeStore";
 import { useToDoListStore } from "@/stores/useToDoListStore";
-import { Moon, Sun } from "lucide-react";
+import { LogIn, Moon, Sun } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import ToDoList from "./components/ToDoList";
 import Sorting from "./components/Sorting";
 import ModalUpdateList from "./components/ModalUpdateList";
 import SearchInput from "./components/SearchInput";
 import ModalDelete from "./components/ModalDelete";
+import { useRouter } from "next/navigation";
+import { useUserStore } from "@/stores/useUserStore";
 
 const Page = () => {
   const { darkMode, setDarkMode } = useThemeStore();
   const [search, setSearch] = useState("");
   const [toDo, setToDo] = useState("");
   const [mounted, setMounted] = useState(false);
+  const { user } = useUserStore()
+  const router = useRouter();
 
   const { toDoList, addToDoList, completedToDos, filter, clearCompletedToDos } =
     useToDoListStore();
 
   useEffect(() => {
     setMounted(true);
+    user.email === "" ? router.push("/sign-in") : router.push("/")
     document.documentElement.setAttribute(
       "data-theme",
       darkMode ? "dark" : "light",
@@ -42,8 +47,9 @@ const Page = () => {
   const itemsLeft = toDoList.filter(
     (toDo) => !completedToDos.includes(toDo.id),
   ).length;
+  console.log(search);
 
-  return (
+  return(
     <div className="min-h-screen bg-base-100 transition-colors duration-300 relative w-full">
       <ModalDelete />
       <ModalUpdateList />
@@ -73,6 +79,19 @@ const Page = () => {
               className="btn btn-ghost btn-circle text-white hover:bg-white/10"
             >
               {darkMode ? <Sun size={24} /> : <Moon size={24} />}
+            </button>
+            <button
+              onClick={() => router.push("/sign-in")} // Arahkan ke route login kamu
+              className="group relative flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 rounded-full text-white text-sm font-bold transition-all duration-300 active:scale-95 shadow-lg overflow-hidden"
+            >
+              {/* Efek kilauan (glow) saat hover */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+
+              <LogIn
+                size={18}
+                className="group-hover:translate-x-1 transition-transform"
+              />
+              <span className="hidden sm:inline">{user.email === "" ? "Login" : user.email}</span>
             </button>
           </div>
 
@@ -143,7 +162,7 @@ const Page = () => {
         </div>
       </div>
     </div>
-  );
+  )
 };
 
 export default Page;
